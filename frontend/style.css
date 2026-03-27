@@ -1,4 +1,142 @@
+/* 1. Center the entire page content */
 body {
-  font-family: Arial;
-  margin: 20px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f0f2f5; /* Light grey background */
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center;     /* Centers vertically */
+    min-height: 100vh;       /* Full screen height */
+    gap: 40px;               /* Space between the two forms */
+    flex-wrap: wrap;         /* Allows stacking on small screens */
+}
+
+/* 2. Style each form section as a white "Card" */
+section {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Soft shadow */
+    width: 320px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+}
+
+/* 3. Make inputs stack vertically and look clean */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box; /* Prevents input from overflowing */
+    font-size: 14px;
+}
+
+/* 4. Style the green buttons */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 15px;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* 5. Responsive fix for mobile */
+@media (max-width: 700px) {
+    body {
+        flex-direction: column;
+        padding: 20px;
+    }
+}
+
+/* 1. Define the entrance animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 2. Apply animation to the sections */
+section {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 320px;
+    text-align: center;
+    
+    /* Animation Trigger */
+    animation: fadeInUp 0.8s ease-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 3. Subtle lift effect when hovering over the cards */
+section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+/* 4. Smooth button pulse effect */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 15px;
+    
+    /* Smooth transition for hover */
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #218838;
+    transform: scale(1.02); /* Makes button slightly larger */
+}
+
+button:active {
+    transform: scale(0.98); /* Makes button look "pressed" */
+}
+
+/* 5. Add a focus glow to inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
 }
