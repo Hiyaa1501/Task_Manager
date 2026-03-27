@@ -1,29 +1,72 @@
 const express = require("express");
 const router = express.Router();
-const Task = require("../models/Task"); // Assuming you have a Task model
+const Task = require("../models/Task"); 
+const auth = require("../middleware/auth"); 
 
 // 1. READ (Get all tasks)
-router.get("/", async (req, res) => {
-    const tasks = await Task.findAll();
-    res.json(tasks);
+// Added 'auth' to ensure only logged-in users see their tasks
+router.get("/", auth, async (req, res) => {
+    try {
+        const tasks = await Task.findAll();
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
 });
 
 // 2. CREATE (Add a new task)
-router.post("/", async (req, res) => {
-    const newTask = await Task.create(req.body);
-    res.status(201).json(newTask);
+router.post("/", auth, async (req, res) => {
+    try {
+        const { title, description } = req.body;
+
+        // validation
+        if (!title) {
+            return res.status(400).json({ message: "Title is required" });
+        }
+
+        const newTask = await Task.create({
+            title,
+            description,
+        });
+
+        res.status(201).json(newTask);
+    } catch (error) {
+        res.status(400).json({ message: "Failed to create task", error: error.message });
+    }
 });
 
-// 3. UPDATE (Mark as done)
-router.put("/:id", async (req, res) => {
-    await Task.update(req.body, { where: { id: req.params.id } });
-    res.send("Task Updated");
+// 3. UPDATE (Mark as done / Edit)
+router.put("/:id", auth, async (req, res) => {
+    try {
+        const [updatedRows] = await Task.update(req.body, { 
+            where: { id: req.params.id } 
+        });
+
+        if (updatedRows === 0) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        res.json({ message: "Task Updated" });
+    } catch (error) {
+        res.status(400).json({ message: "Update failed", error: error.message });
+    }
 });
 
 // 4. DELETE
-router.delete("/:id", async (req, res) => {
-    await Task.destroy({ where: { id: req.params.id } });
-    res.send("Task Deleted");
+router.delete("/:id", auth, async (req, res) => {
+    try {
+        const deletedRows = await Task.destroy({ 
+            where: { id: req.params.id } 
+        });
+
+        if (deletedRows === 0) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        res.json({ message: "Task Deleted" });
+    } catch (error) {
+        res.status(500).json({ message: "Delete failed", error: error.message });
+    }
 });
 
 module.exports = router;
