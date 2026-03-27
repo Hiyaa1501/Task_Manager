@@ -1,15 +1,22 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = function (req, res, next) {
-  const token = req.headers['authorization'];
+module.exports = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    
+    // Check if header exists and starts with "Bearer "
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ msg: "No token, authorization denied" });
+    }
 
-  if (!token) return res.status(401).send("Access Denied");
+    const token = authHeader.split(' ')[1]; // Get the part after "Bearer"
 
-  try {
-    const decoded = jwt.verify(token, "secret");
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(400).send("Invalid Token");
-  }
+    try {
+        // Use the EXACT SAME secret as auth.js
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "hiya_secret_key");
+        req.user = decoded;
+        next();
+    } catch (err) {
+        console.error("Token verification failed:", err.message);
+        res.status(401).json({ msg: "Token is not valid" });
+    }
 };

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Task = require("../models/Task"); 
-const auth = require("../middleware/auth"); 
+const Task = require("../models/tasks"); 
+const auth = require('../middleware/authMiddleware'); 
 
 // 1. READ (Get all tasks)
 // Added 'auth' to ensure only logged-in users see their tasks
