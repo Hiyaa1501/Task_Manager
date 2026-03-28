@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
 
     try {
         // Use the EXACT SAME secret as auth.js
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "hiya_secret_key");
+        const decoded = jwt.verify(token, "hiya_secret_key");
         req.user = decoded;
         next();
     } catch (err) {

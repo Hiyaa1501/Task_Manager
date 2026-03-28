@@ -1,27 +1,108 @@
-const jwt = require('jsonwebtoken');
+const API = "http://localhost:5000/api";
 
-module.exports = (req, res, next) => {
-    // 1. Get the Authorization header
-    const authHeader = req.headers['authorization'];
-    
-    // 2. Check if header exists and starts with "Bearer "
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log("MiddleWare Error: No Bearer token found");
-        return res.status(401).json({ msg: "Access Denied: No Token Provided" });
-    }
+// --- 1. CREATE: Add a new Note ---
+async function addTask() {
+    const taskInput = document.getElementById('taskInput');
+    const title = taskInput.value;
+    const token = localStorage.getItem('token'); 
 
-    // 3. Extract the token part
-    const token = authHeader.split(' ')[1];
+    if (!title) return alert("Please type a note!");
 
     try {
-        // 4. VERIFY using the EXACT same string from your auth.js routes
-        // In your auth.js, you used "secret", so we use "secret" here.
-        const decoded = jwt.verify(token, "secret"); 
-        
-        req.user = decoded; // Add user info to the request
-        next();             // Let them through to the tasks!
+        const res = await fetch(API + "/tasks", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` 
+            },
+            body: JSON.stringify({ title: title })
+        });
+
+        if (res.ok) {
+            taskInput.value = ""; 
+            fetchTasks(); 
+        } else if (res.status === 401) {
+            alert("Session expired. Please login again.");
+            window.location.href = "index.html";
+        }
     } catch (err) {
-        console.log("JWT Error:", err.message);
-        return res.status(401).json({ msg: "Session expired. Please login again." });
+        alert("Server connection failed.");
     }
-};
+}
+
+// --- 2. READ: Fetch and display Notes ---
+async function fetchTasks() {
+    const token = localStorage.getItem('token');
+    const notesContainer = document.getElementById('notesContainer'); 
+
+    if (!notesContainer) return;
+
+    try {
+        const res = await fetch(API + "/tasks", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+            window.location.href = "index.html";
+            return;
+        }
+
+        const tasks = await res.json();
+        notesContainer.innerHTML = ""; 
+
+        tasks.forEach(task => {
+            const noteCard = document.createElement('div');
+            
+            // --- UPDATED: Using Class Name instead of inline style ---
+            noteCard.className = "note-card"; 
+            
+            noteCard.innerHTML = `
+                <textarea id="input-${task.id}">${task.title}</textarea>
+                <div class="note-actions">
+                    <button class="save-btn" onclick="updateTask(${task.id})">Save</button>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                </div>
+            `;
+            notesContainer.appendChild(noteCard);
+        });
+    } catch (err) {
+        console.error("Error loading tasks:", err);
+    }
+}
+
+// --- 3. UPDATE ---
+async function updateTask(id) {
+    const newTitle = document.getElementById(`input-${id}`).value;
+    const token = localStorage.getItem('token');
+    
+    const res = await fetch(`${API}/tasks/${id}`, {
+        method: "PUT",
+        headers: { 
+            "Content-Type": "application/json", 
+            "Authorization": `Bearer ${token}` 
+        },
+        body: JSON.stringify({ title: newTitle })
+    });
+
+    if (res.ok) {
+        alert("Note updated!");
+    }
+}
+
+// --- 4. DELETE ---
+async function deleteTask(id) {
+    const token = localStorage.getItem('token');
+    if (!confirm("Delete this note?")) return;
+
+    const res = await fetch(`${API}/tasks/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (res.ok) {
+        fetchTasks();
+    }
+}
+
+// Initial Load
+fetchTasks();

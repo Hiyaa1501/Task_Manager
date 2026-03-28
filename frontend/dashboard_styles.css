@@ -1,0 +1,181 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8; /* Light blue-grey background */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Rounded Navbar */
+.navbar {
+    background: white;
+    width: 90%;
+    max-width: 1000px;
+    height: 70px;
+    border-radius: 50px; /* High rounding like the image */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 40px;
+}
+
+.nav-btn {
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+}
+
+.nav-btn.active {
+    background: #007bff; /* Bright blue */
+    color: white;
+    border-radius: 20px;
+}
+
+.add-circle-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.signout-btn {
+    background: transparent;
+    color: #ff4d4d; /* Red sign out */
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Notes Grid */
+#notesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    width: 90%;
+    max-width: 1100px;
+}
+
+/* Card Style from Image */
+.note-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+    border-left: 5px solid #ccc; /* Grey indicator like Note 3 */
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top accent color for different notes */
+.note-card:nth-child(even) { border-left-color: #ff8a8a; } /* Pink indicator */
+
+.note-card textarea {
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    resize: none;
+    outline: none;
+}
+
+/* .note-date {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 15px;
+} */
+
+.note-content {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.note-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 15px;
+    padding-top: 10px;
+}
+
+/* Input Area Style */
+.input-container {
+    margin-bottom: 30px;
+}
+
+#taskInput {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 250px;
+}
+
+/* --- Note Action Bar (Container) --- */
+.note-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 10px; 
+    padding-top: 15px;
+}
+
+/* --- Base Button Style (Applies to both) --- */
+.save-new-btn, .save-btn, .delete-btn {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px; 
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Save Button Specifics --- */
+.save-btn {
+    background-color: #f1f3f4; 
+    color: #3c4043;
+}
+
+.save-new-btn {
+    background-color: #6c9db6; 
+    color: #3c4043;
+}
+
+.save-new-btn:active, .save-btn:hover {
+    background-color: #e8f5e9; 
+    color: #1b5e20; 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* --- Delete Button Specifics --- */
+.delete-btn {
+    background-color: #f1f3f4; 
+    color: #3c4043;
+}
+
+.delete-btn:hover {
+    background-color: #ffebee; 
+    color: #b71c1c; 
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* --- Active State (When Clicked) --- */
+.save-new-btn:active, .save-btn:active, .delete-btn:active {
+    transform: scale(0.95);
+}

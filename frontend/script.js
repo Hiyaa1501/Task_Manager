@@ -56,6 +56,7 @@ loginForm.addEventListener('submit', async (e) => {
         });
 
         const data = await res.json();
+        localStorage.setItem('token', data.token);
 
         if (data.token) {
             localStorage.setItem("token", data.token); // Save the key!

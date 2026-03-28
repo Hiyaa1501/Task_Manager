@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
+    <title>My Notes</title>
+    <link rel="stylesheet" href="dashboard_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<h2>Tasks</h2>
+    <div class="navbar">
+        <div class="nav-left">
+            <button class="nav-btn active">All Notes</button>
+            <button class="nav-btn">Important</button>
+        </div>
+        <div class="nav-right">
+            <!-- <button class="add-circle-btn" onclick="openInput()">+</button> -->
+            <button class="signout-btn" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
 
-<input id="taskInput" placeholder="New Task">
-<button onclick="addTask()">Add</button>
+    <div id="inputArea" class="input-container">
+        <input id="taskInput" placeholder="Enter your note title...">
+        <button class="save-new-btn" onclick="addTask()">Save Note</button>
+    </div>
 
-<ul id="taskList"></ul>
+    <div id="notesContainer"></div>
 
-<script src="dashboard_script.js"></script>
+    <script src="dashboard_script.js"></script>
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>
