@@ -11,7 +11,14 @@ const taskRoutes = require('./routes/tasks'); // Path to your task.js routes
 const app = express();
 
 // --- MIDDLEWARE ---
-app.use(cors());
+// --- MIDDLEWARE ---
+app.use(cors({
+    origin: 'https://hiyaa1501.github.io', // Your specific GitHub frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+app.use(express.json());
 app.use(express.json());
 
 // --- ROUTES ---
