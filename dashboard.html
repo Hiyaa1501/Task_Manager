@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Notes</title>
+    <meta charset="UTF-8">
+    <!-- Google Verification -->
+    <meta name="google-site-verification" content="uQlcQ8uKovuu6QA0x1KDseMrXJdltlHfJGcKNH2HCo8" />
+    
+    <!-- External CSS & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="frontend/dashboard_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 1. Security Gatekeeper -->
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- 2. Navbar with Functional Filter Buttons -->
+    <div class="navbar">
+        <div class="nav-left">
+            <button class="nav-btn active" id="allNotesBtn" onclick="showAllNotes()">All Notes</button>
+            <button class="nav-btn" id="importantBtn" onclick="showImportantNotes()">Important</button>
+        </div>
+        <div class="nav-right">
+            <button class="signout-btn" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- 3. New Note Input Area -->
+    <div id="inputArea" class="input-container">
+        <input id="taskInput" placeholder="Enter your note title...">
+        <button class="save-new-btn" onclick="addTask()">Save Note</button>
+    </div>
+
+    <!-- 4. Notes Display Container -->
+    <div id="notesContainer"></div>
+
+    <!-- 5. Scripts -->
+    <script src="frontend/dashboard_script.js"></script>
+    <script>
+        // Tab Filtering Logic
+        function showAllNotes() {
+            isShowingImportantOnly = false;
+            document.getElementById('allNotesBtn').classList.add('active');
+            document.getElementById('importantBtn').classList.remove('active');
+            fetchTasks(); // Reloads list showing everything
+        }
+
+        function showImportantNotes() {
+            isShowingImportantOnly = true;
+            document.getElementById('importantBtn').classList.add('active');
+            document.getElementById('allNotesBtn').classList.remove('active');
+            fetchTasks(); // Reloads list filtered by is_important
+        }
+
+        // Authentication Logic
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

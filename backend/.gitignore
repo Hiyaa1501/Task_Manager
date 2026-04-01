@@ -1,0 +1,7 @@
+﻿node_modules/
+<<<<<<< HEAD
+backend/node_modules/
+frontend/node_modules/
+=======
+>>>>>>> 2dac9eb (Initial commit: Professional Task Manager Backend)
+.env
