@@ -1,4 +1,4 @@
-const API = "http://localhost:5001/api";
+const API = "https://task-manager-3k9d.onrender.com/api";
 
 // --- UI ANIMATION ---
 const signUpButton = document.getElementById('signUp');

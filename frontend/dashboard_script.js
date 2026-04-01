@@ -1,4 +1,4 @@
-const API = "http://localhost:5001/api";
+const API = "https://task-manager-3k9d.onrender.com/api";
 let isShowingImportantOnly = false; 
 
 //1. READ: Fetch and Render Notes
