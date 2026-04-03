@@ -3,17 +3,17 @@ const jwt = require('jsonwebtoken');
 module.exports = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     
-    // Check if header exists and starts with "Bearer "
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ msg: "No token, authorization denied" });
     }
 
-    const token = authHeader.split(' ')[1]; // Get the part after "Bearer"
+    const token = authHeader.split(' ')[1];
 
     try {
-        // Use the EXACT SAME secret as auth.js
-        const decoded = jwt.verify(token, "hiya_secret_key");
-        req.user = decoded;
+        // MATCHED: Uses env variable OR fallback to ensure consistency with login
+        const secret = process.env.JWT_SECRET || "hiya_secret_key";
+        const decoded = jwt.verify(token, secret);
+        req.user = decoded; // This allows req.user.id in your routes
         next();
     } catch (err) {
         console.error("Token verification failed:", err.message);

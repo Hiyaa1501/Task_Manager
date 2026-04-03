@@ -18,6 +18,7 @@ router.post("/", auth, async (req, res) => {
     try {
         const newTask = await Task.create({ 
             title: req.body.title, 
+            is_important: req.body.is_important || false, // Default to false if not provided
             userId: req.user.id 
         });
         res.status(201).json(newTask);
@@ -35,7 +36,7 @@ router.put("/:id", auth, async (req, res) => {
             { where: { id: req.params.id, userId: req.user.id } }
         );
 
-        if (updatedRows === 0) return res.status(404).json({ message: "Unauthorized" });
+        if (updatedRows === 0) return res.status(404).json({ message: "Unauthorized or not found" });
         res.json({ message: "Updated" });
     } catch (error) {
         res.status(400).json({ message: "Update failed", error: error.message });
@@ -46,7 +47,7 @@ router.put("/:id", auth, async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
     try {
         const result = await Task.destroy({ where: { id: req.params.id, userId: req.user.id } });
-        if (result === 0) return res.status(403).json({ message: "Unauthorized" });
+        if (result === 0) return res.status(403).json({ message: "Unauthorized or not found" });
         res.json({ message: "Deleted" });
     } catch (err) {
         res.status(500).json({ message: "Delete failed" });

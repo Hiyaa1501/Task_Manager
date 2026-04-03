@@ -1,34 +1,36 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs"); // Using bcryptjs for better compatibility
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
-  const hashed = await bcrypt.hash(password, 10);
+// MATCHED TO FRONTEND: changed /register to /signup
+router.post("/signup", async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+        
+        // Validation check
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
 
-  const user = await User.create({
-    username,
-    email,
-    password: hashed
-  });
+        const hashed = await bcrypt.hash(password, 10);
 
-  res.json(user);
-});
+        const user = await User.create({
+            username,
+            email,
+            password: hashed
+        });
 
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await User.findOne({ where: { email } });
-  if (!user) return res.status(404).json({ msg: "User not found" });
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ msg: "Invalid password" });
-
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "hiya_secret_key");
-  res.json({ token });
+        res.status(201).json({ message: "User created successfully!" });
+    } catch (err) {
+        // Handle duplicate email errors from Sequelize
+        if (err.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ message: "Email already exists" });
+        }
+        res.status(500).json({ message: "Signup failed", error: err.message });
+    }
 });
 
 module.exports = router;
