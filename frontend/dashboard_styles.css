@@ -1,202 +1,224 @@
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #f0f4f8; /* Light blue-grey background */
+    background-color: #f0f4f8;
     margin: 0;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
 }
 
-/* Rounded Navbar */
 .navbar {
     background: white;
     width: 90%;
     max-width: 1000px;
-    height: 70px;
-    border-radius: 50px; /* High rounding like the image */
+    height: 64px;
+    border-radius: 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    margin-bottom: 40px;
+    padding: 0 24px;
+    border: 0.5px solid #e0e0e0;
+    margin-bottom: 24px;
 }
+
+.nav-left, .nav-right { display: flex; align-items: center; gap: 8px; }
 
 .nav-btn {
     border: none;
     background: transparent;
-    padding: 10px 20px;
+    padding: 8px 18px;
     font-size: 14px;
     font-weight: 500;
     color: #888;
     cursor: pointer;
-}
-
-.nav-btn.active {
-    background: #007bff; /* Bright blue */
-    color: white;
     border-radius: 20px;
+    transition: background 0.2s, color 0.2s;
 }
+.nav-btn:hover { background: #f0f4f8; color: #333; }
+.nav-btn.active { background: #007bff; color: white; }
 
-.add-circle-btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 24px;
-    cursor: pointer;
-    margin-right: 15px;
-}
+.add-btn { color: #007bff; border: 1px solid #007bff; }
+.add-btn:hover { background: #007bff; color: white; }
 
 .signout-btn {
     background: transparent;
-    color: #ff4d4d; /* Red sign out */
+    color: #e53935;
     border: none;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
 }
+.signout-btn:hover { background: #ffebee; }
 
-/* Notes Grid */
+.add-form {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 0.5px solid #e0e0e0;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.add-form.hidden { display: none; }
+.add-form input {
+    border: none;
+    border-bottom: 1.5px solid #007bff;
+    padding: 8px 4px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    color: #333;
+}
+.add-form-actions { display: flex; gap: 10px; }
+
+.search-bar-container {
+    width: 90%;
+    max-width: 1100px;
+    position: relative;
+    margin-bottom: 24px;
+}
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 14px;
+}
+.search-input {
+    width: 100%;
+    max-width: 360px;
+    padding: 10px 14px 10px 38px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    background: white;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.search-input:focus { border-color: #007bff; }
+
 #notesContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
     width: 90%;
     max-width: 1100px;
 }
 
-/* Card Style from Image */
 .note-card {
     background: white;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.03);
-    border-left: 5px solid #ccc; /* Grey indicator like Note 3 */
-    min-height: 150px;
+    border: 0.5px solid #e0e0e0;
+    border-left: 4px solid #d0d0d0;
+    border-radius: 0 12px 12px 0;
+    min-height: 140px;
     display: flex;
     flex-direction: column;
+    transition: border-left-color 0.2s;
 }
-
-/* Top accent color for different notes */
-.note-card:nth-child(even) { border-left-color: #ff8a8a; } /* Pink indicator */
+.note-card:nth-child(3n+1) { border-left-color: #007bff; }
+.note-card:nth-child(3n+2) { border-left-color: #ff7043; }
+.note-card:nth-child(3n+3) { border-left-color: #43a047; }
+.note-card.is-important { border-left-color: #ffca28 !important; }
 
 .note-card textarea {
     border: none;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
+    color: #222;
     resize: none;
     outline: none;
-}
-
-/* .note-date {
-    font-size: 12px;
-    color: #aaa;
-    margin-bottom: 15px;
-} */
-
-.note-content {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
-}
-
-.note-actions {
-    margin-top: auto;
-    display: flex;
-    gap: 15px;
-    padding-top: 10px;
-}
-
-/* Input Area Style */
-.input-container {
-    margin-bottom: 30px;
-}
-
-#taskInput {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    width: 250px;
-}
-
-/* --- Note Action Bar (Container) --- */
-.note-actions {
-    margin-top: auto;
-    display: flex;
-    gap: 10px; 
-    padding-top: 15px;
-}
-
-/* --- Base Button Style (Applies to both) --- */
-.save-new-btn, .save-btn, .delete-btn {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px; 
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
-}
-
-/* --- Save Button Specifics --- */
-.save-btn {
-    background-color: #f1f3f4; 
-    color: #3c4043;
-}
-
-.save-new-btn {
-    background-color: #6c9db6; 
-    color: #3c4043;
-}
-
-.save-new-btn:active, .save-btn:hover {
-    background-color: #e8f5e9; 
-    color: #1b5e20; 
-    transform: translateY(-2px); 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-}
-
-/* --- Delete Button Specifics --- */
-.delete-btn {
-    background-color: #f1f3f4; 
-    color: #3c4043;
-}
-
-.delete-btn:hover {
-    background-color: #ffebee; 
-    color: #b71c1c; 
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-}
-
-/* --- Active State (When Clicked) --- */
-.save-new-btn:active, .save-btn:active, .delete-btn:active {
-    transform: scale(0.95);
-}
-
-/* Grey by default */
-.star-btn {
+    flex: 1;
+    min-height: 60px;
     background: transparent;
+}
+
+.note-date {
+    font-size: 11px;
+    color: #bbb;
+    margin-bottom: 10px;
+}
+
+.note-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 0.5px solid #f0f0f0;
+}
+
+.star-btn, .delete-btn {
     border: none;
-    color: #ccc; 
-    font-size: 22px;
+    background: transparent;
     cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 16px;
 }
+.star-btn { color: #ccc; }
+.star-btn.saved { color: #ffca28; }
+.star-btn:hover { color: #ffca28; background: #fffde7; }
 
-/* Yellow when important */
-.star-btn.saved {
-    color: #ffca28 !important;
-    transform: scale(1.1);
-}
+.delete-btn { color: #ccc; margin-left: auto; }
+.delete-btn:hover { color: #e53935; background: #ffebee; }
 
-.star-btn:hover {
-    color: #ffca28;
-    transform: scale(1.2);
+.delete-confirm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #555;
+    padding-top: 10px;
+    flex-wrap: wrap;
 }
+.delete-confirm.hidden { display: none; }
+.delete-confirm button {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    background: white;
+}
+.delete-confirm button:first-of-type { color: #e53935; border-color: #ffcdd2; }
+.delete-confirm button:first-of-type:hover { background: #ffebee; }
+
+.save-new-btn, .cancel-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    border: none;
+    transition: all 0.2s;
+}
+.save-new-btn { background: #007bff; color: white; }
+.save-new-btn:hover { background: #0069d9; }
+.cancel-btn { background: #f1f3f4; color: #555; }
+.cancel-btn:hover { background: #e0e0e0; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #bbb;
+    grid-column: 1 / -1;
+}
+.empty-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+.empty-state p { font-size: 15px; margin: 0; }

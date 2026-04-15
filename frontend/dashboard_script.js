@@ -1,177 +1,173 @@
 const API = "https://task-manager-3k9d.onrender.com/api";
-let isShowingImportantOnly = false; 
+let isShowingImportantOnly = false;
+let allTasks = [];
 
-//1. READ: Fetch and Render Notes
-
+// READ
 async function fetchTasks() {
     const token = localStorage.getItem('token');
-    const notesContainer = document.getElementById('notesContainer'); 
-    
-    // Safety check: Ensure user is logged in and UI exists
+    const notesContainer = document.getElementById('notesContainer');
     if (!notesContainer || !token) {
         if (!token) window.location.href = "index.html";
         return;
     }
-
     try {
         const res = await fetch(`${API}/tasks`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
-
-        // If token is invalid or expired
-        if (res.status === 401) { 
+        if (res.status === 401) {
             localStorage.clear();
-            window.location.href = "index.html"; 
-            return; 
-        }
-
-        let tasks = await res.json();
-
-        // Handle the "Important" filter toggle
-        if (isShowingImportantOnly) {
-            tasks = tasks.filter(t => t.is_important);
-        }
-
-        // Clear and Redraw UI
-        notesContainer.innerHTML = ""; 
-        
-        if (tasks.length === 0) {
-            notesContainer.innerHTML = `<p style="color: #666; text-align: center; margin-top: 20px;">No notes found here...</p>`;
+            window.location.href = "index.html";
             return;
         }
-
-        tasks.forEach(task => {
-            const noteCard = document.createElement('div');
-            noteCard.className = "note-card"; 
-            const starClass = task.is_important ? "star-btn saved" : "star-btn";
-
-            noteCard.innerHTML = `
-                <textarea id="input-${task.id}" onchange="updateTaskTitle(${task.id})">${task.title}</textarea>
-                <div class="note-actions">
-                    <button id="star-${task.id}" class="${starClass}" onclick="toggleImportant(${task.id}, ${task.is_important})">
-                        <i class="fa-solid fa-star"></i>
-                    </button>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            `;
-            notesContainer.appendChild(noteCard);
-        });
-    } catch (err) { 
-        console.error("Fetch failed:", err.message); 
+        allTasks = await res.json();
+        renderTasks();
+    } catch (err) {
+        console.error("Fetch failed:", err.message);
     }
 }
 
-//2. CREATE: Add New Note
+function renderTasks() {
+    const notesContainer = document.getElementById('notesContainer');
+    const searchQuery = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
-async function addTask() {
+    let tasks = allTasks;
+    if (isShowingImportantOnly) tasks = tasks.filter(t => t.is_important);
+    if (searchQuery) tasks = tasks.filter(t => t.title.toLowerCase().includes(searchQuery));
+
+    notesContainer.innerHTML = "";
+
+    if (tasks.length === 0) {
+        notesContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fa-regular fa-note-sticky empty-icon"></i>
+                <p>${searchQuery ? 'No notes match your search.' : isShowingImportantOnly ? 'No important notes yet.' : 'No notes yet. Add one!'}</p>
+            </div>`;
+        return;
+    }
+
+    tasks.forEach(task => {
+        const noteCard = document.createElement('div');
+        noteCard.className = "note-card";
+        if (task.is_important) noteCard.classList.add('is-important');
+        const starClass = task.is_important ? "star-btn saved" : "star-btn";
+        const dateStr = task.created_at
+            ? new Date(task.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '';
+
+        noteCard.innerHTML = `
+            <textarea id="input-${task.id}" onblur="updateTaskTitle(${task.id})">${task.title}</textarea>
+            ${dateStr ? `<span class="note-date">${dateStr}</span>` : ''}
+            <div class="note-actions">
+                <button id="star-${task.id}" class="${starClass}" onclick="toggleImportant(${task.id}, ${task.is_important})" title="Mark important">
+                    <i class="fa-solid fa-star"></i>
+                </button>
+                <button class="delete-btn" onclick="confirmDelete(${task.id})" title="Delete note">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+            <div class="delete-confirm hidden" id="confirm-${task.id}">
+                <span>Delete this note?</span>
+                <button onclick="deleteTask(${task.id})">Yes</button>
+                <button onclick="cancelDelete(${task.id})">No</button>
+            </div>
+        `;
+        notesContainer.appendChild(noteCard);
+    });
+}
+
+// Filter (client-side, no extra API call)
+window.filterNotes = function() { renderTasks(); }
+
+// CREATE
+window.addTask = async function() {
     const taskInput = document.getElementById('taskInput');
     const title = taskInput.value.trim();
-    const token = localStorage.getItem('token'); 
-    
-    if (!title) return alert("Please enter a note title!");
-
+    const token = localStorage.getItem('token');
+    if (!title) { taskInput.focus(); return; }
     try {
         const res = await fetch(`${API}/tasks`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": `Bearer ${token}` 
-            },
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify({ title })
         });
-
-        if (res.ok) { 
-            taskInput.value = ""; 
-            fetchTasks(); 
+        if (res.ok) {
+            taskInput.value = "";
+            toggleAddForm();
+            fetchTasks();
         }
-    } catch (err) { 
-        console.error("Add task failed:", err.message);
-    }
+    } catch (err) { console.error("Add task failed:", err.message); }
 }
 
-// 3. UPDATE: Toggle Star (Important)
-
-async function toggleImportant(id, currentState) {
+// UPDATE: toggle important
+window.toggleImportant = async function(id, currentState) {
     const token = localStorage.getItem('token');
     try {
         const res = await fetch(`${API}/tasks/${id}`, {
             method: "PUT",
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": `Bearer ${token}` 
-            },
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify({ is_important: !currentState })
         });
-        
-        if (res.ok) fetchTasks(); 
-    } catch (err) { 
-        console.error("Toggle failed", err.message); 
-    }
+        if (res.ok) fetchTasks();
+    } catch (err) { console.error("Toggle failed", err.message); }
 }
 
-//4. UPDATE: Edit Note Title (Auto-save on change)
- 
-async function updateTaskTitle(id) {
-    const newTitle = document.getElementById(`input-${id}`).value;
+// UPDATE: edit title (saves on blur, not on every keystroke)
+window.updateTaskTitle = async function(id) {
+    const newTitle = document.getElementById(`input-${id}`).value.trim();
+    if (!newTitle) return;
     const token = localStorage.getItem('token');
-    
     try {
         const res = await fetch(`${API}/tasks/${id}`, {
             method: "PUT",
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": `Bearer ${token}` 
-            },
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify({ title: newTitle })
         });
-        
-        if (!res.ok) throw new Error("Update failed");
-    } catch (err) { 
-        console.error("Title update failed", err.message);
-        fetchTasks(); // Revert to database state on failure
-    }
+        if (!res.ok) { fetchTasks(); }
+    } catch (err) { console.error("Title update failed", err.message); fetchTasks(); }
 }
 
-//5. DELETE: Remove Note
- 
-async function deleteTask(id) {
+// DELETE with inline confirm
+window.confirmDelete = function(id) {
+    document.getElementById(`confirm-${id}`).classList.remove('hidden');
+}
+window.cancelDelete = function(id) {
+    document.getElementById(`confirm-${id}`).classList.add('hidden');
+}
+window.deleteTask = async function(id) {
     const token = localStorage.getItem('token');
-    if (!confirm("Are you sure you want to delete this note?")) return;
-
     try {
         const res = await fetch(`${API}/tasks/${id}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${token}` }
         });
-        
         if (res.ok) fetchTasks();
-    } catch (err) { 
-        console.error("Delete failed", err.message); 
-    }
+    } catch (err) { console.error("Delete failed", err.message); }
 }
 
-//6. NAVBAR: Tab Filtering
+// NAV
+window.toggleAddForm = function() {
+    const form = document.getElementById('addForm');
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) document.getElementById('taskInput').focus();
+}
+
 window.showAllNotes = function() {
     isShowingImportantOnly = false;
     document.getElementById('allNotesBtn').classList.add('active');
     document.getElementById('importantBtn').classList.remove('active');
-    fetchTasks();
+    renderTasks();
 }
 
 window.showImportantNotes = function() {
     isShowingImportantOnly = true;
     document.getElementById('importantBtn').classList.add('active');
     document.getElementById('allNotesBtn').classList.remove('active');
-    fetchTasks();
+    renderTasks();
 }
 
-//7. AUTH: Sign Out
 window.logout = function() {
     localStorage.clear();
     window.location.href = "index.html";
 }
 
-// Initial Load
 fetchTasks();
